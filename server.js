@@ -7,6 +7,29 @@ let express = require("express"),
 const NodeCache = require("node-cache");
 const myCache = new NodeCache();
 
+myCache.on("expired", function (key, value) {
+  myCache.del(key);
+});
+
+getValues = () => {
+  const keys = myCache.keys();
+
+  console.log("KEYS:", keys);
+
+  keys.forEach((key) =>
+    console.log(
+      "key:",
+      key,
+      " value:",
+      myCache.get(key),
+      " ttl:",
+      myCache.getTtl(key)
+    )
+  );
+
+  // console.log("VALUE", myCache.get());
+};
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
@@ -15,16 +38,18 @@ app.get("/test", function (request, response, next) {
 });
 
 app.get("/add", function (request, response, next) {
-  const val = Math.random();
-  // const ttl = undefined; //TTL in Seconds
-  const ttl = 10; //TTL in 10 Seconds
-  myCache.set("test", val, ttl || null);
-  response.send("added");
+  const key = Math.random();
+  const value = Math.random();
+  const ttl = undefined; //TTL in Seconds
+  // const ttl = 10; //TTL in 10 Seconds
+  // myCache.set(key, val, ttl || null);
+  myCache.set(key, value);
+  myCache.ttl(key, ttl || null);
+  response.send("added:" + key);
 });
 
 app.get("/get", function (request, response, next) {
-  const data = myCache.get("test");
-  console.log("data", data);
+  getValues();
   response.send("reques-ok!");
 });
 
