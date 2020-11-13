@@ -54,7 +54,7 @@ app.get("/get", function (request, response, next) {
 });
 
 app.get("*", function (req, response) {
-  res.send("HELLO");
+  response.send("HELLO");
 });
 
 server.listen(3000, function () {
